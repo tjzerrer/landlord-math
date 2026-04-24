@@ -273,10 +273,20 @@ h1 {
   color: white;
 }
 
+.primary-button:hover {
+  filter: brightness(0.96);
+  box-shadow: 0 10px 24px rgba(74, 51, 29, 0.16);
+}
+
 .secondary-button,
 .copy-button {
   background: rgba(139, 94, 52, 0.12);
   color: var(--ink);
+}
+
+.secondary-button:hover {
+  background: rgba(139, 94, 52, 0.18);
+  box-shadow: 0 10px 24px rgba(74, 51, 29, 0.08);
 }
 
 .copy-button[disabled] {

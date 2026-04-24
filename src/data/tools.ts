@@ -93,8 +93,7 @@ export const tools: Record<ToolSlug, ToolConfig> = {
         "Prorated rent is 19 x $62.00 = $1,178.00."
       ]
     },
-    relatedTools: ["move-in-cost-calculator", "rent-increase-calculator", "late-fee-calculator"],
-    lastUpdated: "April 24, 2026"
+    relatedTools: ["move-in-cost-calculator", "rent-increase-calculator", "late-fee-calculator"]
   },
   "move-in-cost-calculator": {
     slug: "move-in-cost-calculator",
@@ -212,8 +211,7 @@ export const tools: Record<ToolSlug, ToolConfig> = {
         "Add fees: $4,020 + $150 = $4,170 total due at move-in."
       ]
     },
-    relatedTools: ["prorated-rent-calculator", "rent-increase-calculator", "late-fee-calculator"],
-    lastUpdated: "April 24, 2026"
+    relatedTools: ["prorated-rent-calculator", "rent-increase-calculator", "late-fee-calculator"]
   },
   "rent-increase-calculator": {
     slug: "rent-increase-calculator",
@@ -309,8 +307,7 @@ export const tools: Record<ToolSlug, ToolConfig> = {
         "The updated monthly rent is $1,672."
       ]
     },
-    relatedTools: ["prorated-rent-calculator", "move-in-cost-calculator", "late-fee-calculator"],
-    lastUpdated: "April 24, 2026"
+    relatedTools: ["prorated-rent-calculator", "move-in-cost-calculator", "late-fee-calculator"]
   },
   "late-fee-calculator": {
     slug: "late-fee-calculator",
@@ -415,8 +412,7 @@ export const tools: Record<ToolSlug, ToolConfig> = {
         "Add the late fee to rent: $1,950 + $108.50 = $2,058.50 due."
       ]
     },
-    relatedTools: ["prorated-rent-calculator", "move-in-cost-calculator", "rent-increase-calculator"],
-    lastUpdated: "April 24, 2026"
+    relatedTools: ["prorated-rent-calculator", "move-in-cost-calculator", "rent-increase-calculator"]
   }
 };
 

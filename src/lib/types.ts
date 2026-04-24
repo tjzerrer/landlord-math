@@ -55,7 +55,6 @@ export type ToolConfig = {
   faqs: FaqItem[];
   example: ExampleItem;
   relatedTools: ToolSlug[];
-  lastUpdated: string;
 };
 
 export type ProrationInputs = {
