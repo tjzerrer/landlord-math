@@ -132,6 +132,15 @@ function getInputType(field: ToolField) {
                   />
                 )}
                 {field.help && <small>{field.help}</small>}
+                {tool.slug === "move-in-cost-calculator" && field.name === "proratedRent" && (
+                  <small>
+                    If you have not calculated this yet, use the{" "}
+                    <a class="text-link inline-text-link" href="/prorated-rent-calculator">
+                      Prorated Rent Calculator
+                    </a>{" "}
+                    first, then bring that amount back here.
+                  </small>
+                )}
               </label>
             ))}
           </div>
@@ -159,6 +168,7 @@ function getInputType(field: ToolField) {
         <dl class="result-breakdown" data-result-breakdown></dl>
         <p class="summary-note" data-summary-note></p>
       </div>
+      <a class="handoff-link" href="/move-in-cost-calculator" data-handoff-link hidden></a>
 
       <div class="workflow-card">
         <p class="workflow-label">{workflow.title}</p>

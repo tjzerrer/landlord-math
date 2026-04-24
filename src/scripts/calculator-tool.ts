@@ -17,9 +17,14 @@ type Payload = {
   rows: Row[];
   copy: string;
   note: string;
+  handoff?: {
+    href: string;
+    label: string;
+  };
 };
 
 const roots = document.querySelectorAll("[data-calculator-root]");
+const searchParams = new URLSearchParams(window.location.search);
 
 const getNumber = (formData: FormData, key: string) => {
   const value = Number(formData.get(key) || 0);
@@ -62,7 +67,11 @@ const calculators: Record<string, (formData: FormData) => Payload> = {
         "",
         "Please confirm the final amount against the lease and proration method in use."
       ].join("\n"),
-      note: "Confirm the proration rule against the lease and any local requirements."
+      note: "Confirm the proration rule against the lease and any local requirements.",
+      handoff: {
+        href: `/move-in-cost-calculator?proratedRent=${encodeURIComponent(result.proratedRent.toFixed(2))}`,
+        label: "Use this prorated rent in Move-In Cost"
+      }
     };
   },
   "move-in-cost-calculator": (formData) => {
@@ -166,6 +175,7 @@ roots.forEach((root) => {
   const emptyState = root.querySelector(".result-empty");
   const copyButton = root.querySelector("[data-copy-summary]");
   const printButton = root.querySelector("[data-print-summary]");
+  const handoffLink = root.querySelector("[data-handoff-link]");
   const tool = root.getAttribute("data-tool");
   let copiedText = "";
 
@@ -179,10 +189,20 @@ roots.forEach((root) => {
     !(emptyState instanceof HTMLElement) ||
     !(copyButton instanceof HTMLButtonElement) ||
     !(printButton instanceof HTMLButtonElement) ||
+    !(handoffLink instanceof HTMLAnchorElement) ||
     !tool ||
     !calculators[tool]
   ) {
     return;
+  }
+
+  if (tool === "move-in-cost-calculator") {
+    const proratedRentField = form.querySelector('input[name="proratedRent"]');
+    const proratedRent = searchParams.get("proratedRent");
+
+    if (proratedRentField instanceof HTMLInputElement && proratedRent) {
+      proratedRentField.value = proratedRent;
+    }
   }
 
   form.addEventListener("submit", (event) => {
@@ -199,6 +219,13 @@ roots.forEach((root) => {
       emptyState.hidden = true;
       copyButton.disabled = false;
       printButton.hidden = false;
+      if (payload.handoff) {
+        handoffLink.href = payload.handoff.href;
+        handoffLink.textContent = payload.handoff.label;
+        handoffLink.hidden = false;
+      } else {
+        handoffLink.hidden = true;
+      }
       root.scrollIntoView({ behavior: "smooth", block: "start" });
     } catch (issue) {
       error.textContent = issue instanceof Error ? issue.message : "Unable to calculate this result.";
@@ -212,6 +239,7 @@ roots.forEach((root) => {
     error.hidden = true;
     copyButton.disabled = true;
     printButton.hidden = true;
+    handoffLink.hidden = true;
     copiedText = "";
   });
 
