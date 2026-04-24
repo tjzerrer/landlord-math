@@ -42,7 +42,7 @@ const calculators: Record<string, (formData: FormData) => Payload> = {
     });
 
     return {
-      sentence: `Estimated prorated rent for ${result.periodLabel} is ${formatCurrency(result.proratedRent)}.`,
+      sentence: `Tenant should be charged approximately ${formatCurrency(result.proratedRent)} for ${result.periodLabel}.`,
       rows: [
         { label: "Monthly rent", value: formatCurrency(result.monthlyRent) },
         { label: "Proration method", value: prorationMethod === "banker-30" ? "30-day method" : "Actual days" },
@@ -51,7 +51,17 @@ const calculators: Record<string, (formData: FormData) => Payload> = {
         { label: "Daily rent", value: formatCurrency(result.dailyRate) },
         { label: "Prorated rent", value: formatCurrency(result.proratedRent) }
       ],
-      copy: `Prorated rent summary: ${result.periodLabel}, ${result.occupiedDays} occupied days, daily rate ${formatCurrency(result.dailyRate)}, estimated prorated rent ${formatCurrency(result.proratedRent)}.`,
+      copy: [
+        "Prorated Rent Summary",
+        `Occupancy period: ${result.periodLabel}`,
+        `Monthly rent: ${formatCurrency(result.monthlyRent)}`,
+        `Proration method: ${prorationMethod === "banker-30" ? "30-day method" : "Actual days in month"}`,
+        `Occupied days: ${result.occupiedDays}`,
+        `Daily rent: ${formatCurrency(result.dailyRate)}`,
+        `Estimated prorated rent: ${formatCurrency(result.proratedRent)}`,
+        "",
+        "Please confirm the final amount against the lease and proration method in use."
+      ].join("\n"),
       note: "Confirm the proration rule against the lease and any local requirements."
     };
   },
@@ -67,12 +77,17 @@ const calculators: Record<string, (formData: FormData) => Payload> = {
     });
 
     return {
-      sentence: `Estimated total move-in cash due is ${formatCurrency(result.total)}.`,
+      sentence: `Tenant should expect to bring approximately ${formatCurrency(result.total)} at move-in.`,
       rows: result.lines.map((line) => ({ label: line.label, value: formatCurrency(line.amount) })),
-      copy: `Move-in cost summary: total due ${formatCurrency(result.total)}. ${result.lines
-        .filter((line) => line.amount > 0)
-        .map((line) => `${line.label} ${formatCurrency(line.amount)}`)
-        .join(", ")}.`,
+      copy: [
+        "Move-In Cost Summary",
+        ...result.lines
+          .filter((line) => line.amount > 0)
+          .map((line) => `${line.label}: ${formatCurrency(line.amount)}`),
+        `Estimated total due: ${formatCurrency(result.total)}`,
+        "",
+        "Please confirm final charges against the lease or move-in ledger."
+      ].join("\n"),
       note: "Use this as a planning summary and confirm final charges on the lease ledger."
     };
   },
@@ -86,14 +101,22 @@ const calculators: Record<string, (formData: FormData) => Payload> = {
     });
 
     return {
-      sentence: `The updated monthly rent is ${formatCurrency(result.updatedRent)}, which is a change of ${formatCurrency(result.increaseAmount)} (${formatPercent(result.increasePercent)}).`,
+      sentence: `The revised monthly rent would be approximately ${formatCurrency(result.updatedRent)}, a change of ${formatCurrency(result.increaseAmount)} (${formatPercent(result.increasePercent)}).`,
       rows: [
         { label: "Current rent", value: formatCurrency(result.currentRent) },
         { label: "Updated rent", value: formatCurrency(result.updatedRent) },
         { label: "Dollar increase", value: formatCurrency(result.increaseAmount) },
         { label: "Percent increase", value: formatPercent(result.increasePercent) }
       ],
-      copy: `Rent increase summary: current rent ${formatCurrency(result.currentRent)}, updated rent ${formatCurrency(result.updatedRent)}, increase ${formatCurrency(result.increaseAmount)} or ${formatPercent(result.increasePercent)}.`,
+      copy: [
+        "Rent Increase Summary",
+        `Current rent: ${formatCurrency(result.currentRent)}`,
+        `Updated rent: ${formatCurrency(result.updatedRent)}`,
+        `Dollar change: ${formatCurrency(result.increaseAmount)}`,
+        `Percent change: ${formatPercent(result.increasePercent)}`,
+        "",
+        "Please confirm any notice timing and lease requirements before sending an updated rent amount."
+      ].join("\n"),
       note: "This tool shows the math only. Check notice periods and any local increase limits separately."
     };
   },
@@ -108,7 +131,7 @@ const calculators: Record<string, (formData: FormData) => Payload> = {
     });
 
     return {
-      sentence: `Estimated late fee is ${formatCurrency(result.totalLateFee)}, bringing the total amount due to ${formatCurrency(result.totalDue)}.`,
+      sentence: `Tenant owes an estimated late fee of ${formatCurrency(result.totalLateFee)}, bringing the approximate total due to ${formatCurrency(result.totalDue)}.`,
       rows: [
         { label: "Unpaid rent", value: formatCurrency(result.rentAmount) },
         { label: "Flat fee", value: formatCurrency(result.flatFee) },
@@ -117,7 +140,17 @@ const calculators: Record<string, (formData: FormData) => Payload> = {
         { label: "Total due", value: formatCurrency(result.totalDue) },
         { label: "Grace days", value: String(result.graceDays) }
       ],
-      copy: `Late fee summary: unpaid rent ${formatCurrency(result.rentAmount)}, total late fee ${formatCurrency(result.totalLateFee)}, total due ${formatCurrency(result.totalDue)}, grace period ${result.graceDays} days.`,
+      copy: [
+        "Late Fee Summary",
+        `Unpaid rent: ${formatCurrency(result.rentAmount)}`,
+        `Flat fee: ${formatCurrency(result.flatFee)}`,
+        `Percent-based fee: ${formatCurrency(result.percentFeeAmount)}`,
+        `Grace period: ${result.graceDays} day${result.graceDays === 1 ? "" : "s"}`,
+        `Estimated late fee: ${formatCurrency(result.totalLateFee)}`,
+        `Estimated total due: ${formatCurrency(result.totalDue)}`,
+        "",
+        "Please confirm that the fee structure matches the lease and local requirements."
+      ].join("\n"),
       note: "Make sure the fee structure and grace period match the lease and local law."
     };
   }
@@ -132,6 +165,7 @@ roots.forEach((root) => {
   const summaryNote = root.querySelector("[data-summary-note]");
   const emptyState = root.querySelector(".result-empty");
   const copyButton = root.querySelector("[data-copy-summary]");
+  const printButton = root.querySelector("[data-print-summary]");
   const tool = root.getAttribute("data-tool");
   let copiedText = "";
 
@@ -144,6 +178,7 @@ roots.forEach((root) => {
     !(summaryNote instanceof HTMLElement) ||
     !(emptyState instanceof HTMLElement) ||
     !(copyButton instanceof HTMLButtonElement) ||
+    !(printButton instanceof HTMLButtonElement) ||
     !tool ||
     !calculators[tool]
   ) {
@@ -163,6 +198,7 @@ roots.forEach((root) => {
       resultContent.hidden = false;
       emptyState.hidden = true;
       copyButton.disabled = false;
+      printButton.hidden = false;
       root.scrollIntoView({ behavior: "smooth", block: "start" });
     } catch (issue) {
       error.textContent = issue instanceof Error ? issue.message : "Unable to calculate this result.";
@@ -175,6 +211,7 @@ roots.forEach((root) => {
     emptyState.hidden = false;
     error.hidden = true;
     copyButton.disabled = true;
+    printButton.hidden = true;
     copiedText = "";
   });
 
@@ -195,5 +232,9 @@ roots.forEach((root) => {
         copyButton.textContent = "Copy summary";
       }, 1500);
     }
+  });
+
+  printButton.addEventListener("click", () => {
+    window.print();
   });
 });

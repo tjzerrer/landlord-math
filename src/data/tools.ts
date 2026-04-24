@@ -47,6 +47,7 @@ export const tools: Record<ToolSlug, ToolConfig> = {
             name: "prorationMethod",
             label: "Proration method",
             type: "select",
+            help: "Actual days uses the real number of days in the month. The 30-day method uses a fixed 30-day divisor.",
             required: true,
             options: [
               { label: "Actual days in month", value: "actual-days" },
@@ -170,7 +171,8 @@ export const tools: Record<ToolSlug, ToolConfig> = {
             type: "currency",
             placeholder: "0",
             min: 0,
-            step: 0.01
+            step: 0.01,
+            help: "Utilities, keys, admin charges, and local fees may need to be added separately."
           }
         ]
       }
@@ -265,7 +267,8 @@ export const tools: Record<ToolSlug, ToolConfig> = {
             type: "number",
             placeholder: "5",
             min: 0,
-            step: 0.01
+            step: 0.01,
+            help: "If you enter a lower new rent instead, the result can reflect a rent decrease."
           }
         ]
       }
@@ -370,7 +373,8 @@ export const tools: Record<ToolSlug, ToolConfig> = {
             type: "number",
             placeholder: "0",
             min: 0,
-            step: 1
+            step: 1,
+            help: "Grace period is shown for reference and does not change the calculation automatically."
           }
         ]
       }

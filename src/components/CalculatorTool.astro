@@ -9,6 +9,67 @@ interface Props {
 const { tool } = Astro.props;
 
 const relatedTools = tool.relatedTools.map((slug: ToolSlug) => tools[slug]);
+const nextSteps: Record<
+  ToolSlug,
+  { title: string; links: Array<{ slug: ToolSlug; label: string; description: string }> }
+> = {
+  "prorated-rent-calculator": {
+    title: "Next step",
+    links: [
+      {
+        slug: "move-in-cost-calculator",
+        label: "Estimate move-in cash due",
+        description: "Roll prorated rent into the total a tenant should bring at move-in."
+      }
+    ]
+  },
+  "move-in-cost-calculator": {
+    title: "Related landlord calculation",
+    links: [
+      {
+        slug: "prorated-rent-calculator",
+        label: "Calculate partial-month rent",
+        description: "Use this first if the lease starts or ends mid-month."
+      },
+      {
+        slug: "late-fee-calculator",
+        label: "Estimate late fees",
+        description: "Check what could be added if the move-in balance is paid late."
+      }
+    ]
+  },
+  "rent-increase-calculator": {
+    title: "Related landlord calculation",
+    links: [
+      {
+        slug: "late-fee-calculator",
+        label: "Estimate late fees",
+        description: "Useful if you also need to model balances that stay unpaid after the increase."
+      },
+      {
+        slug: "prorated-rent-calculator",
+        label: "Calculate partial-month rent",
+        description: "Helpful when a revised rent needs to be applied for only part of a month."
+      }
+    ]
+  },
+  "late-fee-calculator": {
+    title: "Related landlord calculation",
+    links: [
+      {
+        slug: "rent-increase-calculator",
+        label: "Compare a rent increase",
+        description: "Check the new monthly rent before applying any future late-fee rules."
+      },
+      {
+        slug: "move-in-cost-calculator",
+        label: "Estimate move-in cash due",
+        description: "Useful when you want the full upfront balance in one tenant-ready summary."
+      }
+    ]
+  }
+};
+const workflow = nextSteps[tool.slug];
 
 function getInputMode(field: ToolField) {
   if (field.type === "currency" || field.type === "number") {
@@ -87,7 +148,10 @@ function getInputType(field: ToolField) {
     <aside class="result-card" data-result-card>
       <div class="result-card__header">
         <p class="result-label">Output summary</p>
-        <button type="button" class="copy-button" data-copy-summary disabled>Copy summary</button>
+        <div class="result-actions">
+          <button type="button" class="copy-button" data-copy-summary disabled>Copy summary</button>
+          <button type="button" class="copy-button" data-print-summary hidden>Print / Save PDF</button>
+        </div>
       </div>
       <p class="result-empty">Enter your numbers and calculate to see the result.</p>
       <div class="result-content" data-result-content hidden>
@@ -95,13 +159,28 @@ function getInputType(field: ToolField) {
         <dl class="result-breakdown" data-result-breakdown></dl>
         <p class="summary-note" data-summary-note></p>
       </div>
+
+      <div class="workflow-card">
+        <p class="workflow-label">{workflow.title}</p>
+        <div class="workflow-links">
+          {workflow.links.map((item) => (
+            <a class="workflow-link" href={`/${item.slug}`}>
+              <strong>{item.label}</strong>
+              <span>{item.description}</span>
+            </a>
+          ))}
+        </div>
+      </div>
     </aside>
   </div>
 </section>
 
 <section class="detail-grid">
   <article class="detail-card">
-    <h2>How We Calculated This</h2>
+    <div class="section-heading">
+      <h2>How We Calculated This</h2>
+      <a class="text-link" href="/methodology">See full methodology</a>
+    </div>
     <ol>
       {tool.methodology.map((item) => (
         <li>{item}</li>
@@ -132,6 +211,9 @@ function getInputType(field: ToolField) {
       ))}
     </ul>
     <p class="disclaimer">This tool is for informational use only and is not legal, tax, or financial advice.</p>
+    <p class="methodology-link-row">
+      <a class="text-link" href="/methodology">See full methodology</a>
+    </p>
   </article>
 
   <article class="detail-card">
