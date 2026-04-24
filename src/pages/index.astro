@@ -1,0 +1,61 @@
+---
+import { orderedTools } from "@/data/tools";
+import ToolLayout from "@/layouts/ToolLayout.astro";
+---
+
+<ToolLayout
+  title="Landlord Math Toolkit | Rental Calculators for Lease Math"
+  description="Landlord-focused calculators for prorated rent, move-in costs, rent increases, and late fees."
+>
+  <section class="hero-card">
+    <p class="eyebrow">Third site from the portfolio blueprint</p>
+    <h1>Landlord Math, without spreadsheet friction.</h1>
+    <p class="hero-copy">
+      Landlord Math Toolkit is a small set of worksheet-style calculators for the rent questions that come up
+      every month: prorations, move-in totals, rent increases, and late fees.
+    </p>
+    <p class="hero-note">
+      Each tool keeps the formulas visible, adds a copy-ready summary, and includes plain-language caveats so
+      the output is useful in real lease conversations.
+    </p>
+  </section>
+
+  <section class="detail-card">
+    <h2>MVP Tools</h2>
+    <div class="tool-grid">
+      {orderedTools.map((tool) => (
+        <a class="tool-link" href={`/${tool.slug}`}>
+          <strong>{tool.name}</strong>
+          <p>{tool.description}</p>
+        </a>
+      ))}
+    </div>
+  </section>
+
+  <section class="detail-grid">
+    <article class="detail-card">
+      <h2>What this site is for</h2>
+      <p>
+        This site is built for small landlords, property managers, and anyone who needs quick rent math without
+        digging through a spreadsheet.
+      </p>
+      <ul>
+        <li>Calculator-first pages with short, useful supporting content</li>
+        <li>Clear assumptions and methodology on every tool</li>
+        <li>Copyable summaries for texts, emails, and rent ledgers</li>
+      </ul>
+    </article>
+
+    <article class="detail-card">
+      <h2>What this site is not</h2>
+      <p>
+        This MVP intentionally stays lean. It avoids the maintenance-heavy features the blueprint warned against.
+      </p>
+      <ul>
+        <li>No tenant portals or saved accounts</li>
+        <li>No city-level rent comps or state-by-state legal rule engine</li>
+        <li>No payment processing or document storage</li>
+      </ul>
+    </article>
+  </section>
+</ToolLayout>

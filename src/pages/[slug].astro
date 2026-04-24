@@ -1,0 +1,22 @@
+---
+import CalculatorTool from "@/components/CalculatorTool.astro";
+import { orderedTools } from "@/data/tools";
+import ToolLayout from "@/layouts/ToolLayout.astro";
+
+export function getStaticPaths() {
+  return orderedTools.map((tool) => ({
+    params: { slug: tool.slug },
+    props: { tool }
+  }));
+}
+
+const { tool } = Astro.props;
+
+if (!tool) {
+  throw new Error("Tool not found");
+}
+---
+
+<ToolLayout title={tool.metaTitle} description={tool.metaDescription}>
+  <CalculatorTool tool={tool} />
+</ToolLayout>

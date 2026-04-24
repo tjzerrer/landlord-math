@@ -1,0 +1,339 @@
+---
+import { tools } from "@/data/tools";
+import type { ToolConfig, ToolField, ToolSlug } from "@/lib/types";
+
+interface Props {
+  tool: ToolConfig;
+}
+
+const { tool } = Astro.props;
+
+const relatedTools = tool.relatedTools.map((slug: ToolSlug) => tools[slug]);
+
+function getInputMode(field: ToolField) {
+  if (field.type === "currency" || field.type === "number") {
+    return "decimal";
+  }
+
+  return undefined;
+}
+
+function getInputType(field: ToolField) {
+  if (field.type === "currency" || field.type === "number") {
+    return "number";
+  }
+
+  return field.type;
+}
+---
+
+<section class="hero-card">
+  <p class="eyebrow">Landlord math toolkit</p>
+  <h1>{tool.name}</h1>
+  <p class="hero-copy">{tool.intro}</p>
+  <p class="hero-note">
+    Built for quick lease math with visible assumptions, plain-English output, and copy-ready summaries.
+  </p>
+</section>
+
+<section
+  class="calculator-shell"
+  data-calculator-root
+  data-tool={tool.slug}
+  data-tool-name={tool.name}
+  data-tool-config={JSON.stringify(tool)}
+>
+  <div class="calculator-main">
+    <form class="tool-form" data-calculator-form>
+      {tool.sections.map((section) => (
+        <fieldset class="form-section">
+          <legend>{section.title}</legend>
+          <p>{section.description}</p>
+          <div class="field-grid">
+            {section.fields.map((field) => (
+              <label class="field">
+                <span>{field.label}</span>
+                {field.type === "select" ? (
+                  <select name={field.name} required={field.required}>
+                    {field.options.map((option) => (
+                      <option value={option.value}>{option.label}</option>
+                    ))}
+                  </select>
+                ) : (
+                  <input
+                    name={field.name}
+                    type={getInputType(field)}
+                    inputmode={getInputMode(field)}
+                    min={field.min}
+                    step={field.step}
+                    placeholder={field.placeholder}
+                    required={field.required}
+                  />
+                )}
+                {field.help && <small>{field.help}</small>}
+              </label>
+            ))}
+          </div>
+        </fieldset>
+      ))}
+
+      <div class="form-actions">
+        <button type="submit" class="primary-button">Calculate</button>
+        <button type="reset" class="secondary-button">Reset</button>
+      </div>
+      <p class="form-error" data-form-error hidden></p>
+    </form>
+
+    <aside class="result-card" data-result-card>
+      <div class="result-card__header">
+        <p class="result-label">Output summary</p>
+        <button type="button" class="copy-button" data-copy-summary disabled>Copy summary</button>
+      </div>
+      <p class="result-empty">Enter your numbers and calculate to see the result.</p>
+      <div class="result-content" data-result-content hidden>
+        <p class="result-sentence" data-result-sentence></p>
+        <dl class="result-breakdown" data-result-breakdown></dl>
+        <p class="summary-note" data-summary-note></p>
+      </div>
+    </aside>
+  </div>
+</section>
+
+<section class="detail-grid">
+  <article class="detail-card">
+    <h2>How We Calculated This</h2>
+    <ol>
+      {tool.methodology.map((item) => (
+        <li>{item}</li>
+      ))}
+    </ol>
+  </article>
+
+  <article class="detail-card">
+    <h2>{tool.example.title}</h2>
+    <p>{tool.example.summary}</p>
+    <ol>
+      {tool.example.steps.map((step) => (
+        <li>{step}</li>
+      ))}
+    </ol>
+  </article>
+</section>
+
+<section class="detail-grid">
+  <article class="detail-card trust-card">
+    <div class="section-heading">
+      <h2>Assumptions</h2>
+      <p>Last updated {tool.lastUpdated}</p>
+    </div>
+    <ul>
+      {tool.assumptions.map((item) => (
+        <li>{item}</li>
+      ))}
+    </ul>
+    <p class="disclaimer">This tool is for informational use only and is not legal, tax, or financial advice.</p>
+  </article>
+
+  <article class="detail-card">
+    <h2>Frequently Asked Questions</h2>
+    <div class="faq-list">
+      {tool.faqs.map((faq) => (
+        <details>
+          <summary>{faq.question}</summary>
+          <p>{faq.answer}</p>
+        </details>
+      ))}
+    </div>
+  </article>
+</section>
+
+<section class="detail-card related-card">
+  <h2>Related Tools</h2>
+  <div class="related-grid">
+    {relatedTools.map((item) => (
+      <a class="related-link" href={`/${item.slug}`}>
+        <strong>{item.shortName}</strong>
+        <span>{item.description}</span>
+      </a>
+    ))}
+  </div>
+</section>
+
+<script type="module">
+  import {
+    calculateLateFee,
+    calculateMoveInCost,
+    calculateProratedRent,
+    calculateRentIncrease,
+    formatCurrency,
+    formatPercent
+  } from "@/lib/calculators";
+
+  const roots = document.querySelectorAll("[data-calculator-root]");
+
+  const getNumber = (formData, key) => {
+    const value = Number(formData.get(key) || 0);
+    return Number.isFinite(value) ? value : 0;
+  };
+
+  const makeRows = (rows) =>
+    rows
+      .map(
+        (row) =>
+          `<div><dt>${row.label}</dt><dd>${row.value}</dd></div>`
+      )
+      .join("");
+
+  const calculators = {
+    "prorated-rent-calculator": (formData) => {
+      const result = calculateProratedRent({
+        monthlyRent: getNumber(formData, "monthlyRent"),
+        occupancyStart: String(formData.get("occupancyStart") || ""),
+        occupancyEnd: String(formData.get("occupancyEnd") || ""),
+        prorationMethod: String(formData.get("prorationMethod") || "actual-days")
+      });
+
+      return {
+        sentence: `Estimated prorated rent for ${result.periodLabel} is ${formatCurrency(result.proratedRent)}.`,
+        rows: [
+          { label: "Monthly rent", value: formatCurrency(result.monthlyRent) },
+          { label: "Proration method", value: result.daysInMonth === 30 ? "30-day method" : "Actual days" },
+          { label: "Days in divisor", value: String(result.daysInMonth) },
+          { label: "Occupied days", value: String(result.occupiedDays) },
+          { label: "Daily rent", value: formatCurrency(result.dailyRate) },
+          { label: "Prorated rent", value: formatCurrency(result.proratedRent) }
+        ],
+        copy: `Prorated rent summary: ${result.periodLabel}, ${result.occupiedDays} occupied days, daily rate ${formatCurrency(result.dailyRate)}, estimated prorated rent ${formatCurrency(result.proratedRent)}.`,
+        note: "Confirm the proration rule against the lease and any local requirements."
+      };
+    },
+    "move-in-cost-calculator": (formData) => {
+      const result = calculateMoveInCost({
+        monthlyRent: getNumber(formData, "monthlyRent"),
+        securityDeposit: getNumber(formData, "securityDeposit"),
+        proratedRent: getNumber(formData, "proratedRent"),
+        applicationFee: getNumber(formData, "applicationFee"),
+        petDeposit: getNumber(formData, "petDeposit"),
+        parkingFee: getNumber(formData, "parkingFee"),
+        miscFee: getNumber(formData, "miscFee")
+      });
+
+      return {
+        sentence: `Estimated total move-in cash due is ${formatCurrency(result.total)}.`,
+        rows: result.lines.map((line) => ({ label: line.label, value: formatCurrency(line.amount) })),
+        copy: `Move-in cost summary: total due ${formatCurrency(result.total)}. ${result.lines
+          .filter((line) => line.amount > 0)
+          .map((line) => `${line.label} ${formatCurrency(line.amount)}`)
+          .join(", ")}.`,
+        note: "Use this as a planning summary and confirm final charges on the lease ledger."
+      };
+    },
+    "rent-increase-calculator": (formData) => {
+      const result = calculateRentIncrease({
+        currentRent: getNumber(formData, "currentRent"),
+        mode: String(formData.get("mode") || "new-rent"),
+        newRent: getNumber(formData, "newRent"),
+        percentIncrease: getNumber(formData, "percentIncrease")
+      });
+
+      return {
+        sentence: `The updated monthly rent is ${formatCurrency(result.updatedRent)}, which is a change of ${formatCurrency(result.increaseAmount)} (${formatPercent(result.increasePercent)}).`,
+        rows: [
+          { label: "Current rent", value: formatCurrency(result.currentRent) },
+          { label: "Updated rent", value: formatCurrency(result.updatedRent) },
+          { label: "Dollar increase", value: formatCurrency(result.increaseAmount) },
+          { label: "Percent increase", value: formatPercent(result.increasePercent) }
+        ],
+        copy: `Rent increase summary: current rent ${formatCurrency(result.currentRent)}, updated rent ${formatCurrency(result.updatedRent)}, increase ${formatCurrency(result.increaseAmount)} or ${formatPercent(result.increasePercent)}.`,
+        note: "This tool shows the math only. Check notice periods and any local increase limits separately."
+      };
+    },
+    "late-fee-calculator": (formData) => {
+      const result = calculateLateFee({
+        rentAmount: getNumber(formData, "rentAmount"),
+        feeType: String(formData.get("feeType") || "flat"),
+        flatFee: getNumber(formData, "flatFee"),
+        percentFee: getNumber(formData, "percentFee"),
+        graceDays: getNumber(formData, "graceDays")
+      });
+
+      return {
+        sentence: `Estimated late fee is ${formatCurrency(result.totalLateFee)}, bringing the total amount due to ${formatCurrency(result.totalDue)}.`,
+        rows: [
+          { label: "Unpaid rent", value: formatCurrency(result.rentAmount) },
+          { label: "Flat fee", value: formatCurrency(result.flatFee) },
+          { label: "Percent-based fee", value: formatCurrency(result.percentFeeAmount) },
+          { label: "Total late fee", value: formatCurrency(result.totalLateFee) },
+          { label: "Total due", value: formatCurrency(result.totalDue) },
+          { label: "Grace days", value: String(result.graceDays) }
+        ],
+        copy: `Late fee summary: unpaid rent ${formatCurrency(result.rentAmount)}, total late fee ${formatCurrency(result.totalLateFee)}, total due ${formatCurrency(result.totalDue)}, grace period ${result.graceDays} days.`,
+        note: "Make sure the fee structure and grace period match the lease and local law."
+      };
+    }
+  };
+
+  roots.forEach((root) => {
+    const form = root.querySelector("[data-calculator-form]");
+    const error = root.querySelector("[data-form-error]");
+    const resultContent = root.querySelector("[data-result-content]");
+    const resultSentence = root.querySelector("[data-result-sentence]");
+    const resultBreakdown = root.querySelector("[data-result-breakdown]");
+    const summaryNote = root.querySelector("[data-summary-note]");
+    const emptyState = root.querySelector(".result-empty");
+    const copyButton = root.querySelector("[data-copy-summary]");
+    const tool = root.getAttribute("data-tool");
+    let copiedText = "";
+
+    if (!(form instanceof HTMLFormElement) || !tool || !calculators[tool]) {
+      return;
+    }
+
+    form.addEventListener("submit", (event) => {
+      event.preventDefault();
+      error.hidden = true;
+
+      try {
+        const payload = calculators[tool](new FormData(form));
+        resultSentence.textContent = payload.sentence;
+        resultBreakdown.innerHTML = makeRows(payload.rows);
+        summaryNote.textContent = payload.note;
+        copiedText = payload.copy;
+        resultContent.hidden = false;
+        emptyState.hidden = true;
+        copyButton.disabled = false;
+        root.scrollIntoView({ behavior: "smooth", block: "start" });
+      } catch (issue) {
+        error.textContent = issue instanceof Error ? issue.message : "Unable to calculate this result.";
+        error.hidden = false;
+      }
+    });
+
+    form.addEventListener("reset", () => {
+      resultContent.hidden = true;
+      emptyState.hidden = false;
+      error.hidden = true;
+      copyButton.disabled = true;
+      copiedText = "";
+    });
+
+    copyButton.addEventListener("click", async () => {
+      if (!copiedText) {
+        return;
+      }
+
+      try {
+        await navigator.clipboard.writeText(copiedText);
+        copyButton.textContent = "Copied";
+        window.setTimeout(() => {
+          copyButton.textContent = "Copy summary";
+        }, 1500);
+      } catch {
+        copyButton.textContent = "Copy failed";
+        window.setTimeout(() => {
+          copyButton.textContent = "Copy summary";
+        }, 1500);
+      }
+    });
+  });
+</script>
