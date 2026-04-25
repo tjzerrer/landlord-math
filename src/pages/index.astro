@@ -1,15 +1,42 @@
 ---
+import JsonLd from "@/components/JsonLd.astro";
+import { site } from "@/data/site";
 import { orderedTools } from "@/data/tools";
 import ToolLayout from "@/layouts/ToolLayout.astro";
+
+const webSiteSchema = {
+  "@context": "https://schema.org",
+  "@type": "WebSite",
+  name: site.name,
+  url: site.url,
+  description: site.description
+};
+
+const collectionPageSchema = {
+  "@context": "https://schema.org",
+  "@type": "CollectionPage",
+  name: `${site.name} Home`,
+  url: site.url,
+  description: site.description,
+  isPartOf: {
+    "@type": "WebSite",
+    name: site.name,
+    url: site.url
+  }
+};
 ---
 
 <ToolLayout
   title="Landlord Math Toolkit | Rental Calculators for Lease Math"
-  description="Landlord-focused calculators for prorated rent, move-in costs, rent increases, and late fees."
+  description={site.description}
 >
+  <Fragment slot="head">
+    <JsonLd data={webSiteSchema} />
+    <JsonLd data={collectionPageSchema} />
+  </Fragment>
   <section class="hero-card homepage-hero">
     <div>
-      <p class="eyebrow">Third site from the portfolio blueprint</p>
+      <p class="eyebrow">Rental calculators for everyday lease math</p>
       <h1>Landlord Math, without spreadsheet friction.</h1>
       <p class="hero-copy">
         Landlord Math Toolkit is a small set of worksheet-style calculators for the rent questions that come up
@@ -52,7 +79,7 @@ import ToolLayout from "@/layouts/ToolLayout.astro";
   </section>
 
   <section class="detail-card">
-    <h2>MVP Tools</h2>
+    <h2>Calculator Tools</h2>
     <div class="tool-grid">
       {orderedTools.map((tool) => (
         <a class="tool-link" href={`/${tool.slug}`}>
@@ -80,7 +107,8 @@ import ToolLayout from "@/layouts/ToolLayout.astro";
     <article class="detail-card">
       <h2>What this site is not</h2>
       <p>
-        This MVP intentionally stays lean. It avoids the maintenance-heavy features the blueprint warned against.
+        This site stays focused on quick rent math. It does not try to replace lease review, compliance checks,
+        or full property management software.
       </p>
       <ul>
         <li>No tenant portals or saved accounts</li>

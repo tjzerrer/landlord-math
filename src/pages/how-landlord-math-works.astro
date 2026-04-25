@@ -1,11 +1,40 @@
 ---
+import JsonLd from "@/components/JsonLd.astro";
+import { site } from "@/data/site";
 import ToolLayout from "@/layouts/ToolLayout.astro";
+
+const pageUrl = `${site.url}/how-landlord-math-works/`;
+const webPageSchema = {
+  "@context": "https://schema.org",
+  "@type": "WebPage",
+  name: "How Landlord Math Works",
+  url: pageUrl,
+  description: "A plain-language overview of the most common rent calculations landlords need.",
+  isPartOf: {
+    "@type": "WebSite",
+    name: site.name,
+    url: site.url
+  }
+};
+
+const breadcrumbSchema = {
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  itemListElement: [
+    { "@type": "ListItem", position: 1, name: site.name, item: site.url },
+    { "@type": "ListItem", position: 2, name: "How Landlord Math Works", item: pageUrl }
+  ]
+};
 ---
 
 <ToolLayout
   title="How Landlord Math Works | Landlord Math Toolkit"
   description="A plain-language overview of the most common rent calculations landlords need."
 >
+  <Fragment slot="head">
+    <JsonLd data={webPageSchema} />
+    <JsonLd data={breadcrumbSchema} />
+  </Fragment>
   <section class="hero-card">
     <p class="eyebrow">Helper page</p>
     <h1>Four rent calculations that come up constantly.</h1>

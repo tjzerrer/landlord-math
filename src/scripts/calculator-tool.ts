@@ -31,6 +31,116 @@ const getNumber = (formData: FormData, key: string) => {
   return Number.isFinite(value) ? value : 0;
 };
 
+const getFieldValue = (form: HTMLFormElement, name: string) =>
+  form.elements.namedItem(name) instanceof HTMLInputElement ||
+  form.elements.namedItem(name) instanceof HTMLSelectElement
+    ? form.elements.namedItem(name)
+    : null;
+
+const markInvalid = (
+  field: HTMLInputElement | HTMLSelectElement | null,
+  message?: string
+) => {
+  if (!field) {
+    return;
+  }
+
+  field.setAttribute("aria-invalid", "true");
+  if (message && field instanceof HTMLInputElement) {
+    field.setCustomValidity(message);
+  }
+};
+
+const clearFieldState = (field: HTMLInputElement | HTMLSelectElement) => {
+  field.removeAttribute("aria-invalid");
+  if (field instanceof HTMLInputElement) {
+    field.setCustomValidity("");
+  }
+};
+
+const clearValidationState = (form: HTMLFormElement) => {
+  Array.from(form.elements).forEach((element) => {
+    if (element instanceof HTMLInputElement || element instanceof HTMLSelectElement) {
+      clearFieldState(element);
+    }
+  });
+};
+
+const hasPositiveValue = (value: number) => Number.isFinite(value) && value > 0;
+
+const validateToolForm = (tool: string, form: HTMLFormElement, formData: FormData) => {
+  clearValidationState(form);
+
+  if (tool === "move-in-cost-calculator") {
+    const amountNames = [
+      "monthlyRent",
+      "securityDeposit",
+      "proratedRent",
+      "applicationFee",
+      "petDeposit",
+      "parkingFee",
+      "miscFee"
+    ];
+    const hasAnyAmount = amountNames.some((name) => hasPositiveValue(getNumber(formData, name)));
+
+    if (!hasAnyAmount) {
+      markInvalid(getFieldValue(form, "monthlyRent"), "Enter at least one move-in amount.");
+      throw new Error("Enter at least one move-in amount before calculating.");
+    }
+  }
+
+  if (tool === "rent-increase-calculator") {
+    const currentRentField = getFieldValue(form, "currentRent");
+    const mode = String(formData.get("mode") || "new-rent");
+    const currentRent = getNumber(formData, "currentRent");
+    const newRent = getNumber(formData, "newRent");
+    const percentIncrease = getNumber(formData, "percentIncrease");
+
+    if (!hasPositiveValue(currentRent)) {
+      markInvalid(currentRentField, "Enter the current monthly rent.");
+      throw new Error("Enter the current monthly rent before calculating an increase.");
+    }
+
+    if (mode === "new-rent" && !hasPositiveValue(newRent)) {
+      markInvalid(getFieldValue(form, "newRent"), "Enter the new monthly rent.");
+      throw new Error("Enter the new monthly rent when using the new-rent mode.");
+    }
+
+    if (mode === "percent" && !hasPositiveValue(percentIncrease)) {
+      markInvalid(getFieldValue(form, "percentIncrease"), "Enter the percent increase.");
+      throw new Error("Enter the percent increase when using percent mode.");
+    }
+  }
+
+  if (tool === "late-fee-calculator") {
+    const rentAmount = getNumber(formData, "rentAmount");
+    const feeType = String(formData.get("feeType") || "flat");
+    const flatFee = getNumber(formData, "flatFee");
+    const percentFee = getNumber(formData, "percentFee");
+
+    if (!hasPositiveValue(rentAmount)) {
+      markInvalid(getFieldValue(form, "rentAmount"), "Enter the monthly rent.");
+      throw new Error("Enter the monthly rent before calculating a late fee.");
+    }
+
+    if (feeType === "flat" && !hasPositiveValue(flatFee)) {
+      markInvalid(getFieldValue(form, "flatFee"), "Enter the flat late fee.");
+      throw new Error("Enter the flat late fee when using flat-fee mode.");
+    }
+
+    if (feeType === "percent" && !hasPositiveValue(percentFee)) {
+      markInvalid(getFieldValue(form, "percentFee"), "Enter the percent late fee.");
+      throw new Error("Enter the percent late fee when using percent-fee mode.");
+    }
+
+    if (feeType === "combined" && !hasPositiveValue(flatFee) && !hasPositiveValue(percentFee)) {
+      markInvalid(getFieldValue(form, "flatFee"), "Enter a flat fee, a percent fee, or both.");
+      markInvalid(getFieldValue(form, "percentFee"), "Enter a flat fee, a percent fee, or both.");
+      throw new Error("Enter at least one late-fee amount when using the combined-fee mode.");
+    }
+  }
+};
+
 const makeRows = (rows: Row[]) =>
   rows.map((row) => `<div><dt>${row.label}</dt><dd>${row.value}</dd></div>`).join("");
 
@@ -210,7 +320,9 @@ roots.forEach((root) => {
     error.hidden = true;
 
     try {
-      const payload = calculators[tool](new FormData(form));
+      const formData = new FormData(form);
+      validateToolForm(tool, form, formData);
+      const payload = calculators[tool](formData);
       resultSentence.textContent = payload.sentence;
       resultBreakdown.innerHTML = makeRows(payload.rows);
       summaryNote.textContent = payload.note;
@@ -234,6 +346,7 @@ roots.forEach((root) => {
   });
 
   form.addEventListener("reset", () => {
+    clearValidationState(form);
     resultContent.hidden = true;
     emptyState.hidden = false;
     error.hidden = true;

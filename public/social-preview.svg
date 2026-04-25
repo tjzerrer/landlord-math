@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630" role="img" aria-labelledby="title desc">
+  <title id="title">Landlord Math Toolkit</title>
+  <desc id="desc">Rental calculators for prorated rent, move-in costs, rent increases, and late fees.</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#0f172a" />
+      <stop offset="100%" stop-color="#1d4ed8" />
+    </linearGradient>
+  </defs>
+  <rect width="1200" height="630" rx="36" fill="url(#bg)" />
+  <rect x="64" y="64" width="180" height="180" rx="28" fill="#f8fafc" opacity="0.12" />
+  <rect x="96" y="96" width="116" height="116" rx="24" fill="#f8fafc" opacity="0.96" />
+  <path d="M128 180V140h28v40h24v-56h28v56h20" fill="none" stroke="#1d4ed8" stroke-linecap="round" stroke-linejoin="round" stroke-width="14"/>
+  <text x="64" y="330" fill="#bfdbfe" font-family="Arial, Helvetica, sans-serif" font-size="28" font-weight="700" letter-spacing="1">LANDLORD MATH TOOLKIT</text>
+  <text x="64" y="420" fill="#ffffff" font-family="Arial, Helvetica, sans-serif" font-size="72" font-weight="700">Lease math that is</text>
+  <text x="64" y="500" fill="#ffffff" font-family="Arial, Helvetica, sans-serif" font-size="72" font-weight="700">clear, fast, and copy-ready.</text>
+  <text x="64" y="570" fill="#dbeafe" font-family="Arial, Helvetica, sans-serif" font-size="30">Prorated rent • Move-in costs • Rent increases • Late fees</text>
+</svg>

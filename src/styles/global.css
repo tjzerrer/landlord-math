@@ -244,6 +244,12 @@ h1 {
   border-color: var(--accent);
 }
 
+.field input[aria-invalid="true"],
+.field select[aria-invalid="true"] {
+  border-color: #8a1f1f;
+  background: #fff5f5;
+}
+
 .field small {
   font-size: 0.88rem;
   line-height: 1.35;

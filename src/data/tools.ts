@@ -234,7 +234,8 @@ export const tools: Record<ToolSlug, ToolConfig> = {
             type: "currency",
             placeholder: "1800",
             min: 0,
-            step: 0.01
+            step: 0.01,
+            required: true
           }
         ]
       },
@@ -330,7 +331,8 @@ export const tools: Record<ToolSlug, ToolConfig> = {
             type: "currency",
             placeholder: "1800",
             min: 0,
-            step: 0.01
+            step: 0.01,
+            required: true
           }
         ]
       },
