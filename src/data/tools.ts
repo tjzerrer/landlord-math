@@ -7,7 +7,7 @@ export const tools: Record<ToolSlug, ToolConfig> = {
     shortName: "Prorated Rent",
     description: "Estimate partial-month rent with clear day counts and a transparent calculation trail.",
     intro:
-      "Use this prorated rent calculator to estimate what is due when a tenant moves in or out mid-month.",
+      "Estimate what is due for a partial month.",
     metaTitle: "Prorated Rent Calculator | Landlord Math Toolkit",
     metaDescription:
       "Calculate prorated rent for a partial month with day counts, daily rent, assumptions, and a copyable summary.",
@@ -101,7 +101,7 @@ export const tools: Record<ToolSlug, ToolConfig> = {
     shortName: "Move-In Cost",
     description: "Bundle first-month rent, deposits, and fees into one copy-ready move-in total.",
     intro:
-      "Estimate the total cash due at move-in by combining first month rent, prorated rent, deposits, and common fees.",
+      "Estimate the total cash due at move-in.",
     metaTitle: "Move-In Cost Calculator | Landlord Math Toolkit",
     metaDescription:
       "Estimate total move-in costs with first month rent, prorated rent, deposits, fees, and a copyable summary.",
@@ -219,7 +219,7 @@ export const tools: Record<ToolSlug, ToolConfig> = {
     shortName: "Rent Increase",
     description: "Compare current rent to a proposed increase in dollars or percent.",
     intro:
-      "Use this rent increase calculator to compare the current rent with a proposed updated rent or a percentage change.",
+      "Compare the current rent to a proposed increase.",
     metaTitle: "Rent Increase Calculator | Landlord Math Toolkit",
     metaDescription:
       "Calculate a rent increase in dollars or percent and review the updated monthly rent with a clear summary.",
@@ -316,7 +316,7 @@ export const tools: Record<ToolSlug, ToolConfig> = {
     shortName: "Late Fee",
     description: "Estimate flat, percentage, or combined late-fee charges and total amount due.",
     intro:
-      "Estimate a late fee using a flat amount, a percentage of rent, or a combination of both, then see the total amount due.",
+      "Estimate a late fee and the total amount due.",
     metaTitle: "Late Fee Calculator | Landlord Math Toolkit",
     metaDescription:
       "Calculate flat, percent, or combined rent late fees with grace-day notes, fee totals, and a copyable summary.",
