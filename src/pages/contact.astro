@@ -1,0 +1,99 @@
+---
+import JsonLd from "@/components/JsonLd.astro";
+import { site } from "@/data/site";
+import ToolLayout from "@/layouts/ToolLayout.astro";
+
+const pageUrl = `${site.url}/contact/`;
+const webPageSchema = {
+  "@context": "https://schema.org",
+  "@type": "ContactPage",
+  name: "Contact",
+  url: pageUrl,
+  description: "Where to send calculator feedback and suggestions for Landlord Math Toolkit.",
+  isPartOf: {
+    "@type": "WebSite",
+    name: site.name,
+    url: site.url
+  }
+};
+
+const breadcrumbSchema = {
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  itemListElement: [
+    { "@type": "ListItem", position: 1, name: site.name, item: site.url },
+    { "@type": "ListItem", position: 2, name: "Contact", item: pageUrl }
+  ]
+};
+---
+
+<ToolLayout
+  title="Contact | Landlord Math Toolkit"
+  description="Where to send calculator feedback and suggestions for Landlord Math Toolkit."
+>
+  <Fragment slot="head">
+    <JsonLd data={webPageSchema} />
+    <JsonLd data={breadcrumbSchema} />
+  </Fragment>
+
+  <section class="hero-card">
+    <p class="eyebrow">Contact</p>
+    <h1>Questions, suggestions, or calculator requests.</h1>
+    <p class="hero-copy">
+      Send a message directly from the form below.
+    </p>
+  </section>
+
+  <section class="detail-grid">
+    <article class="detail-card">
+      <h2>Send a message</h2>
+
+      <form class="contact-form" action={site.contactFormAction} method="POST">
+        <input type="hidden" name="_subject" value="Landlord Math Toolkit contact form" />
+        <input type="hidden" name="_next" value={`${site.url}/contact/thanks/`} />
+        <input type="hidden" name="_captcha" value="false" />
+        <input type="text" name="_honey" class="contact-form__honeypot" tabindex="-1" autocomplete="off" />
+
+        <div class="field-grid">
+          <label class="field">
+            <span>Name</span>
+            <input type="text" name="name" required />
+          </label>
+
+          <label class="field">
+            <span>Email</span>
+            <input type="email" name="email" required />
+          </label>
+
+          <label class="field">
+            <span>Subject</span>
+            <input type="text" name="subject" required />
+          </label>
+        </div>
+
+        <label class="field">
+          <span>Message</span>
+          <textarea class="contact-textarea" name="message" rows="7" required></textarea>
+        </label>
+
+        <div class="form-actions">
+          <button type="submit" class="primary-button">Send message</button>
+        </div>
+      </form>
+    </article>
+
+    <article class="detail-card">
+      <h2>What to include</h2>
+      <ul>
+        <li>The calculator you were using.</li>
+        <li>The number or summary that felt confusing.</li>
+        <li>Any rent-math tool you would like to see added next.</li>
+      </ul>
+
+      <p class="disclaimer">
+        These tools provide calculation support only. Lease language, local law, notice rules, fee caps, and
+        compliance requirements vary by location and should be verified independently.
+      </p>
+    </article>
+  </section>
+</ToolLayout>

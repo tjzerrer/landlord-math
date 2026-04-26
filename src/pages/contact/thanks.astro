@@ -1,0 +1,54 @@
+---
+import JsonLd from "@/components/JsonLd.astro";
+import { site } from "@/data/site";
+import ToolLayout from "@/layouts/ToolLayout.astro";
+
+const pageUrl = `${site.url}/contact/thanks/`;
+const webPageSchema = {
+  "@context": "https://schema.org",
+  "@type": "WebPage",
+  name: "Contact confirmation",
+  url: pageUrl,
+  description: "Confirmation page for the Landlord Math Toolkit contact form.",
+  isPartOf: { "@type": "WebSite", name: site.name, url: site.url }
+};
+---
+
+<ToolLayout
+  title="Message Sent | Landlord Math Toolkit"
+  description="Confirmation page for the Landlord Math Toolkit contact form."
+>
+  <Fragment slot="head">
+    <JsonLd data={webPageSchema} />
+  </Fragment>
+
+  <section class="hero-card">
+    <p class="eyebrow">Contact</p>
+    <h1>Thanks. Your message was sent.</h1>
+    <p class="hero-copy">
+      Your message was routed to the inbox successfully.
+    </p>
+  </section>
+
+  <section class="detail-grid">
+    <article class="detail-card">
+      <h2>What happens next</h2>
+      <p>
+        If you shared a calculator question, bug, or suggestion, it can be reviewed from there.
+        You can return to the toolkit any time.
+      </p>
+
+      <div class="form-actions">
+        <a class="primary-button" href="/">Back to calculators</a>
+        <a class="secondary-button" href="/contact/">Send another message</a>
+      </div>
+    </article>
+
+    <article class="detail-card">
+      <p class="disclaimer">
+        These tools provide calculation support only. Lease language, local law, notice rules, fee caps, and
+        compliance requirements vary by location and should be verified independently.
+      </p>
+    </article>
+  </section>
+</ToolLayout>
